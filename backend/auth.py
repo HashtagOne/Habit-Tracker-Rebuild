@@ -30,7 +30,7 @@ def register():
 
 @auth_blueprint.route("/auth/login", methods=["POST"])
 def login():
-    data = request.get.json()
+    data = request.get_json()
 
     if not data or not data.get("username") or not data.get("password"):
         return jsonify({"error": "Username and password are required."}), 400

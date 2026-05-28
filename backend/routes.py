@@ -26,7 +26,7 @@ def create_category():
         user_id=current_user.id
     )
     db.session.add(category)
-    db.session.commit
+    db.session.commit()
     return jsonify(category.to_dict()), 201
 
 @routes_blueprint.route("/categories/<int:id>", methods=["PUT"])
@@ -113,7 +113,7 @@ def create_completion():
     if not data or not data.get("habit_id"):
         return jsonify({"error": "habit_id is required."}), 400
     
-    habit = db.session.get(Habit, data["habit-id"])
+    habit = db.session.get(Habit, data["habit_id"])
 
     if not habit or habit.category.user_id != current_user.id:
         return jsonify({"error": "Habit not found."}), 404
@@ -121,7 +121,7 @@ def create_completion():
     today = date.today()
 
     existing = Completion.query.filter_by(
-        habit_id=data["habit.id"],
+        habit_id=data["habit_id"],
         date=today
     ).first()
 
@@ -142,7 +142,7 @@ def delete_completion(id):
     completion = db.session.get(Completion, id)
 
     if not completion or completion.habit.category.user_id != current_user.id:
-        return jsonify({"error": "Commpletion not found."}), 404
+        return jsonify({"error": "Completion not found."}), 404
     db.session.delete(completion)
     db.session.commit()
     return jsonify({"message": "Completion deleted."}), 200
