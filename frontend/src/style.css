@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600&display=swap');
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* CSS */
+:root {
+  --bg-primary: #f5f2eb;
+  --bg-card: #eceadf;
+  --bg-sidebar: #ede9e0;
+  --text-primary: #2C2C2A;
+  --text-secondary: #5F5E5A;
+  --text-muted: #9a9890;
+  --accent-green: #3B6D11;
+  --accent-green-hover: #2f5a0d;
+  --accent-amer: #854F0B;
+  --border: rgba(0,0,0,0.07);
+  --shadow: rgba(0,0,0,0.06);
+
+  --color-forest: #3B6D11;
+  --color-sage: #6B8F5E;
+  --color-amber: #854F0B;
+  --color-terracotta: #9B4A2E;
+  --color-slate: #4A5568;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+  overflow: hidden;
+  height: 100%;
+}
+
+h1, h2, h3 {
+  font-family: 'Fraunces', sans-serif;
+}
+
+.hidden {
+  display: none !important;
+}
