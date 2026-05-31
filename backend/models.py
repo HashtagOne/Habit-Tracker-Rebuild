@@ -41,7 +41,7 @@ class Habit(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "completions": [c.date.isoformat() for c in self.completions]
+            "completions": [{"id": c.id, "date": c.date.isoformat()} for c in self.completions]
         }
 
 class Completion(db.Model):
