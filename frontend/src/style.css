@@ -26,10 +26,16 @@ html {
   --shadow: rgba(0,0,0,0.06);
 
   --color-forest: #3B6D11;
-  --color-sage: #6B8F5E;
+  --color-sage: #5C7A6B;
   --color-amber: #854F0B;
   --color-terracotta: #9B4A2E;
   --color-slate: #4A5568;
+}
+
+.app-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
 }
 
 body {

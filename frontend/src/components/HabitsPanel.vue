@@ -1,5 +1,8 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import ModalOverlay from './ModalOverlay.vue'
+import ConfirmOverlay from './ConfirmOverlay.vue'
+
 
 const props = defineProps({
     category: {
@@ -8,12 +11,66 @@ const props = defineProps({
     }
 })
 
+const editingId = ref(null)
+const editingName = ref("")
+
+const modalVisible = ref(false)
+const modalHeading = ref("")
+const modalInitialValue = ref("")
+const modalCallback = ref(null)
+const modalPlaceholder = ref("")
+const modalAccentColor = ref("#3B6D11")
+
+const confirmVisible = ref(false)
+const confirmHeading = ref("")
+const confirmCallback = ref(null)
+
+
 const emit = defineEmits(['updated'])
 
 const API = "http://localhost:5000"
 
 // today's date in YYYY-MM-DD format
 const today = new Date().toISOString().split("T")[0]
+
+// EDITING //
+
+function startEdit(habit) {
+    editingId.value = habit.id
+    editingName.value = habit.name
+}
+
+async function saveEdit(id) {
+    await fetch(`${API}/habits/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        credentials: "include",
+        body: JSON.stringify({name: editingName.value})
+    })
+
+    editingId.value = null
+    emit('updated')
+}
+
+function handleSave(value) {
+    if (modalCallback.value) modalCallback.value(value)
+    modalVisible.value = false
+}
+
+function handleCancel() {
+    modalVisible.value = false
+}
+
+function handleConfirm() {
+    if (confirmCallback.value) confirmCallback.value()
+    confirmVisible.value = false
+}
+
+function handleConfirmCancel() {
+    confirmVisible.value = false
+}
+
+
 
 // checks if habit has a completion for today
 function isCompletedToday(habit) {
@@ -64,30 +121,39 @@ async function toggleHabit(habit) {
     emit('updated')
 }
 
-async function addHabit() {
-    const name = prompt("Habit name:")
-    if (!name) return
+function addHabit() {
+    modalHeading.value = "Add Habit"
+    modalAccentColor.value = `var(--color-${props.category.color})`
+    modalInitialValue.value = ""
+    modalPlaceholder.value = "e.g. Drink 2L of water"
+    modalVisible.value = true
+    modalCallback.value = async (name) => {
 
-    await fetch(`${API}/habits`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json"},
-        credentials: "include",
-        body: JSON.stringify({
-            name,
-            category_id: props.category.id
+        await fetch(`${API}/habits`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            credentials: "include",
+            body: JSON.stringify({
+                name,
+                category_id: props.category.id
+            })
         })
-    })
-    emit('updated')
+        emit('updated')
+    }
 }
 
-async function deleteHabit(e, id) {
+function deleteHabit(e, id) {
     e.stopPropagation() 
+    confirmHeading.value = "Delete this category?"
+    confirmVisible.value = true
+    confirmCallback.value = async () => {
 
-    await fetch(`${API}/habits/${id}`, {
-        method: "DELETE",
-        credentials: "include"
-    })
-    emit('updated')
+        await fetch(`${API}/habits/${id}`, {
+            method: "DELETE",
+            credentials: "include"
+        })
+        emit('updated')
+    }
 }
 
 const progress = computed(() => {
@@ -95,6 +161,8 @@ const progress = computed(() => {
     const completed = props.category.habits.filter(h => isCompletedToday(h)).length
     return Math.round((completed / props.category.habits.length) * 100)
 })
+
+
 </script>
 
 <template>
@@ -134,7 +202,20 @@ const progress = computed(() => {
                         @change="toggleHabit(habit)"
                     />
                     <div class="habit-info">
-                        <span class="habit-name">{{  habit.name  }}</span>
+                        <span
+                          v-if="editingId !== habit.id"
+                            class="habit-name" 
+                            @dblclick="startEdit(habit)">
+                            {{  habit.name  }}</span>
+
+                        <input
+                            v-else
+                            class="edit-input"
+                            v-model="editingName"
+                            @keydown.enter="saveEdit(habit.id)"
+                            @blur="saveEdit(habit.id)"
+                            @click.stop
+                        />
                         <span class="habit-streak">🔥 {{ getStreak(habit) }}</span>
                     </div>
                     <button
@@ -152,6 +233,23 @@ const progress = computed(() => {
                 + Add Habit
             </button>
           </div>
+          
+            <ModalOverlay
+                :visible="modalVisible"
+                :heading="modalHeading"
+                :accentColor="modalAccentColor"
+                :initialValue="modalInitialValue"
+                :placeholder="modalPlaceholder"
+                @save="handleSave"
+                @cancel="handleCancel"
+            />
+        
+            <ConfirmOverlay
+                :visible="confirmVisible"
+                :heading="confirmHeading"
+                @confirm="handleConfirm"
+                @cancel="handleConfirmCancel"
+            />
     </div>
 </template>
 
@@ -283,6 +381,22 @@ const progress = computed(() => {
 .habit-streak {
     font-size: 0.8rem;
     color: var(--accent-amber);
+}
+
+.edit-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--category-color);
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    width: auto;
+    min-width: 80px;
+    flex: 1;
+    max-width: 300px;
+    padding: 0;
 }
 
 .delete-habit-btn {

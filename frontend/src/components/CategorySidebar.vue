@@ -1,5 +1,39 @@
 <script setup>
 import {ref, onMounted} from 'vue'
+import ModalOverlay from './ModalOverlay.vue'
+import ConfirmOverlay from './ConfirmOverlay.vue'
+
+
+const editingId = ref(null)
+const editingName = ref("")
+
+const modalVisible = ref(false)
+const modalHeading = ref("")
+const modalInitialValue = ref("")
+const modalCallback = ref(null)
+const modalPlaceholder = ref("")
+const modalAccentColor = ref("#3B6D11")
+
+const confirmVisible = ref(false)
+const confirmHeading = ref("")
+const confirmCallback = ref(null)
+
+function startEdit(category) {
+    editingId.value = category.id
+    editingName.value = category.name
+}
+
+async function saveEdit(id) {
+    await fetch(`${API}/categories/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        credentials: "include",
+        body: JSON.stringify({name: editingName.value})
+    })
+
+    editingId.value = null
+    emit('updated')
+}
 
 const props = defineProps({
     categories: {
@@ -25,31 +59,59 @@ function nextColor() {
     return color
 }
 
-async function addCategory() {
-    const name = prompt("Category name:")
-    if (!name) return
-    
-    const color = nextColor()
+function addCategory() {
+    const color = colors[colorIndex % colors.length]
+    modalAccentColor.value = `var(--color-${color})`
+    modalHeading.value = "Add Category"
+    modalInitialValue.value = ""
+    modalVisible.value = true
+    modalPlaceholder.value = "e.g. Morning Routine"
+    modalCallback.value = async (name) => {
+        
+        const color = nextColor()
 
-    await fetch(`${API}/categories`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        credentials: "include",
-        body: JSON.stringify({name, color})
-    })
+        await fetch(`${API}/categories`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            credentials: "include",
+            body: JSON.stringify({name, color})
+        })
 
-    emit('updated')
+        emit('updated')
+    }
 }
 
-async function deleteCategory(e, id) {
+function handleSave(value) {
+    if (modalCallback.value) modalCallback.value(value)
+    modalVisible.value = false
+}
+
+function handleCancel() {
+    modalVisible.value = false
+}
+
+function deleteCategory(e, id) {
     e.stopPropagation()
 
-    await fetch(`${API}/categories/${id}`, {
-        method: "DELETE",
-        credentials: "include"
-    })
+    confirmHeading.value = "Delete this category?"
+    confirmVisible.value = true
+    confirmCallback.value = async () => {
 
-    emit('updated')
+        await fetch(`${API}/categories/${id}`, {
+            method: "DELETE",
+            credentials: "include"
+        })
+        emit('updated')
+    }
+}
+
+function handleConfirm() {
+    if (confirmCallback.value) confirmCallback.value()
+    confirmVisible.value = false
+}
+
+function handleConfirmCancel() {
+    confirmVisible.value = false
 }
 
 function selectCategory(category) {
@@ -69,10 +131,24 @@ function selectCategory(category) {
                 :key="category.id"
                 class="category-item"
                 :class="[`color-${category.color}`, { active: category.id === selectedId }]"
+                :style="{ '--category-color': `var(--color-${category.color})` }"
                 @click="selectCategory(category)"
             >
                 <div class="category-info">
-                    <span class="category-name">{{ category.name }}</span>
+                    <span
+                        v-if="editingId !== category.id"
+                        class="category-name" 
+                        @dblclick="startEdit(category)">
+                        {{ category.name }}</span>
+
+                    <input
+                        v-else
+                        class="edit-input"
+                        v-model="editingName"
+                        @keydown.enter="saveEdit(category.id)"
+                        @blur="saveEdit(category.id)"
+                        @click.stop
+                    />
                     <span class="category-count">{{ category.habits.length }} habits</span>
                 </div>
                 <button
@@ -89,6 +165,22 @@ function selectCategory(category) {
         <button class="add-category-btn" @click="addCategory">
             + Add Category
         </button>
+
+        <ModalOverlay
+            :visible="modalVisible"
+            :heading="modalHeading"
+            :accentColor="modalAccentColor"
+            :initialValue="modalInitialValue"
+            :placeholder="modalPlaceholder"
+            @save="handleSave"
+            @cancel="handleCancel"
+        />
+        <ConfirmOverlay
+            :visible="confirmVisible"
+            :heading="confirmHeading"
+            @confirm="handleConfirm"
+            @cancel="handleConfirmCancel"
+        />
     </aside>
 </template>
 
@@ -149,6 +241,19 @@ function selectCategory(category) {
 
 .category-item:active {
     background-color: var(--bg-card);
+}
+
+.edit-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--category-color);
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    width: 100%;
+    padding: 0;
 }
 
 .color-forest {border-left-color: var(--color-forest); }

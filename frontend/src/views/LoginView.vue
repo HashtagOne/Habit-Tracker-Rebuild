@@ -95,7 +95,6 @@ async function login() {
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: var(--bg-primary);
         animation: fadeUp 0.8s ease both;
     }
 

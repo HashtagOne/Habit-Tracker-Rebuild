@@ -1,9 +1,16 @@
 import bcrypt
 from flask import Blueprint, request, jsonify
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User
 
 auth_blueprint = Blueprint("auth", __name__)
+
+
+@auth_blueprint.route("/auth/me", methods=["GET"])
+@login_required
+def me():
+    return jsonify({"username": current_user.username}), 200
+
 
 @auth_blueprint.route("/auth/register", methods=["POST"])
 def register():

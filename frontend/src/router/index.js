@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import DashboardView from '../views/DashboardView.vue'
-import { isLoggedIn } from '../auth.js'
+import { isLoggedIn, authReady } from '../auth.js'
+import { watch } from 'vue'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -23,7 +24,19 @@ const router = createRouter({
     ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+    // wait for auth check to complete before making any routing decisions
+    if (!authReady.value) {
+        await new Promise(resolve => {
+            const stop = watch(authReady, (val) => {
+                if (val) {
+                    stop()
+                    resolve()
+                }
+            })
+        })
+    }
+
     if (to.meta.requiresAuth && !isLoggedIn.value) {
         next('/login')
     } else {
