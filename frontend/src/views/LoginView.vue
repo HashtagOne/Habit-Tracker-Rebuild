@@ -95,7 +95,7 @@ async function login() {
         display: flex;
         align-items: center;
         justify-content: center;
-        animation: fadeUp 0.8s ease both;
+        background: transparent;
     }
 
     .auth-card {
