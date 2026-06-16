@@ -29,8 +29,6 @@ const confirmCallback = ref(null)
 
 const emit = defineEmits(['updated'])
 
-const API = "http://localhost:5000"
-
 // today's date in YYYY-MM-DD format
 const today = new Date().toISOString().split("T")[0]
 

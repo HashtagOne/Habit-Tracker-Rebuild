@@ -6,7 +6,7 @@ import { isLoggedIn, authReady } from '../auth.js'
 import { watch } from 'vue'
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory('/Habit-Tracker-Rebuild/'),
     routes: [
         {
             path: '/login',

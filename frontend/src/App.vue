@@ -2,7 +2,7 @@
 import { RouterView, useRoute } from 'vue-router'
 import { onMounted, ref, watch } from 'vue'
 import { isLoggedIn, currentUsername, authReady, transitionName } from './auth.js'
-import { API } from '../config.js'
+import { API } from './config.js'
 const route = useRoute()
 
 watch(() => route.path, (newPath) => {
