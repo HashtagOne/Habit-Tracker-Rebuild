@@ -22,8 +22,7 @@ login_manager.init_app(app)
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-CORS(app, supports_credentials=True, origins=["https://hashtagone.github.io/Habit-Tracker-Rebuild/"])
-
+CORS(app, supports_credentials=True, origins=["https://hashtagone.github.io/Habit-Tracker-Rebuild"])
 from auth import auth_blueprint
 from routes import routes_blueprint
 
