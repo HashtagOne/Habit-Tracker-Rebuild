@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { isLoggedIn, currentUsername, transitionName } from '../auth.js'
 import CategorySidebar from '../components/CategorySidebar.vue'
 import HabitsPanel from '../components/HabitsPanel.vue'
+import { API } from '../config.js'
 
 const router = useRouter()
 
@@ -13,7 +14,7 @@ const loading = ref(true)
 
 async function loadCategories() {
     try {
-        const response = await fetch("http://localhost:5000/categories", {
+        const response = await fetch(`${API}/categories`, {
             credentials: "include"
         })
 
@@ -38,7 +39,7 @@ async function loadCategories() {
 }
 
 async function logout() {
-    await fetch("http://localhost:5000/auth/logout", {
+    await fetch(`${API}/auth/logout`, {
         method: "POST",
         credentials: "include"
     })

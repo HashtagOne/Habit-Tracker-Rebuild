@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-
+import { API } from '../config.js'
 const router = useRouter()
 
 const username = ref("")
@@ -22,7 +22,7 @@ async function register() {
             return
         }
 
-        const response = await fetch("http://localhost:5000/auth/register", {
+        const response = await fetch(`${API}/auth/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json"}, 
             credentials: "include",

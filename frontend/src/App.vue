@@ -2,7 +2,7 @@
 import { RouterView, useRoute } from 'vue-router'
 import { onMounted, ref, watch } from 'vue'
 import { isLoggedIn, currentUsername, authReady, transitionName } from './auth.js'
-
+import { API } from '../config.js'
 const route = useRoute()
 
 watch(() => route.path, (newPath) => {
@@ -17,7 +17,7 @@ watch(() => route.path, (newPath) => {
 
 onMounted(async () => {
     try {
-        const response = await fetch("http://localhost:5000/auth/me", {
+        const response = await fetch(`${API}/auth/me`, {
             credentials: "include"
         })
         if (response.ok) {

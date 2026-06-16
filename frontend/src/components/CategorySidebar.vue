@@ -2,7 +2,7 @@
 import {ref, onMounted} from 'vue'
 import ModalOverlay from './ModalOverlay.vue'
 import ConfirmOverlay from './ConfirmOverlay.vue'
-
+import { API } from '../config.js'
 
 const editingId = ref(null)
 const editingName = ref("")
@@ -47,8 +47,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['select', 'updated'])
-
-const API = "http://localhost:5000"
 
 const colors = ["forest", "sage", "amber", "terracotta", "slate"]
 let colorIndex = 0
