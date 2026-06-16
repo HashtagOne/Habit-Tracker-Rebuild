@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { isLoggedIn, currentUsername } from '../auth.js'
+import { isLoggedIn, currentUsername, transitionName } from '../auth.js'
 import CategorySidebar from '../components/CategorySidebar.vue'
 import HabitsPanel from '../components/HabitsPanel.vue'
 
@@ -38,12 +38,13 @@ async function loadCategories() {
 }
 
 async function logout() {
-    await fetch("http://127.0.0.1:5000/auth/logout", {
+    await fetch("http://localhost:5000/auth/logout", {
         method: "POST",
         credentials: "include"
     })
     isLoggedIn.value = false
     currentUsername.value = ""
+    transitionName.value = 'fade-down'
     router.push("/login")
 }
 
@@ -59,7 +60,6 @@ onMounted(() => {
 
 
 <template>
-<pre> {{ category }} </pre>
     <div class="dashboard">
         <header class="dashboard-header">
             <h1 class="dashboard-title">Habits</h1>
@@ -85,6 +85,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
+
+
 .dashboard {
     display: flex;
     flex-direction: column;

@@ -1,17 +1,18 @@
 <script setup>
 import { RouterView, useRoute } from 'vue-router'
 import { onMounted, ref, watch } from 'vue'
-import { isLoggedIn, currentUsername, authReady } from './auth.js'
+import { isLoggedIn, currentUsername, authReady, transitionName } from './auth.js'
 
 const route = useRoute()
-const transitionName = ref('fade-up')
 
 watch(() => route.path, (newPath) => {
+    console.log('route changed to:', newPath)
     if (newPath === '/') {
         transitionName.value = 'fade-up'
     } else {
         transitionName.value = 'fade-down'
     }
+    console.log('transitionName set to:', transitionName.value)
 })
 
 onMounted(async () => {

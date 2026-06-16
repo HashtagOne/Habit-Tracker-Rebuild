@@ -124,41 +124,43 @@ function selectCategory(category) {
         <div class="sidebar-header">
             <span class="sidebar-label">Categories</span>
         </div>
+    
+        <div class="categories-wrapper">
+            <TransitionGroup tag="div" name="category" class="categories-list">
+                <div
+                    v-for="category in categories"
+                    :key="category.id"
+                    class="category-item"
+                    :class="[`color-${category.color}`, { active: category.id === selectedId }]"
+                    :style="{ '--category-color': `var(--color-${category.color})` }"
+                    @click="selectCategory(category)"
+                >
+                    <div class="category-info">
+                        <span
+                            v-if="editingId !== category.id"
+                            class="category-name" 
+                            @dblclick="startEdit(category)">
+                            {{ category.name }}</span>
 
-        <div class="categories-list">
-            <div
-                v-for="category in categories"
-                :key="category.id"
-                class="category-item"
-                :class="[`color-${category.color}`, { active: category.id === selectedId }]"
-                :style="{ '--category-color': `var(--color-${category.color})` }"
-                @click="selectCategory(category)"
-            >
-                <div class="category-info">
-                    <span
-                        v-if="editingId !== category.id"
-                        class="category-name" 
-                        @dblclick="startEdit(category)">
-                        {{ category.name }}</span>
-
-                    <input
-                        v-else
-                        class="edit-input"
-                        v-model="editingName"
-                        @keydown.enter="saveEdit(category.id)"
-                        @blur="saveEdit(category.id)"
-                        @click.stop
-                    />
-                    <span class="category-count">{{ category.habits.length }} habits</span>
+                        <input
+                            v-else
+                            class="edit-input"
+                            v-model="editingName"
+                            @keydown.enter="saveEdit(category.id)"
+                            @blur="saveEdit(category.id)"
+                            @click.stop
+                        />
+                        <span class="category-count">{{ category.habits.length }} habits</span>
+                    </div>
+                    <button
+                        class="delete-category-btn"
+                        @click="deleteCategory($event, category.id)"
+                    >✕</button>
                 </div>
-                <button
-                    class="delete-category-btn"
-                    @click="deleteCategory($event, category.id)"
-                >✕</button>
-            </div>
+            </TransitionGroup>
 
             <p v-if="categories.length === 0" class="empty-state">
-                No categories yet.
+                 No categories yet.
             </p>
         </div>
 
@@ -208,14 +210,22 @@ function selectCategory(category) {
     color: var(--text-muted);
 }
 
-.categories-list {
+.categories-wrapper {
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.categories-list {
     padding: 8px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    position: relative;
 }
+
 
 .category-item {
     display: flex;
@@ -229,7 +239,6 @@ function selectCategory(category) {
     border-bottom: 0.5px solid transparent;
     border-right: 4px solid transparent;
     transition: background-color 0.2s, border-color 0.2s;
-    animation: slideInFromLeft 0.5s ease-out both;
 }
 
 .category-item:hover {
@@ -241,6 +250,21 @@ function selectCategory(category) {
 
 .category-item:active {
     background-color: var(--bg-card);
+}
+
+.category-leave-active {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    position: absolute;
+    width: calc(100% - 16px);
+}
+
+.category-enter-active {
+    animation: slideInFromLeft 0.5s ease-out both;
+}
+
+.category-leave-to {
+    opacity: 0;
+    transform: translateX(-24px);
 }
 
 .edit-input {

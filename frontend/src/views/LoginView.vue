@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { isLoggedIn, currentUsername } from '../auth.js'
+import { isLoggedIn, currentUsername, transitionName } from '../auth.js'
 
 const router = useRouter()
 
@@ -33,7 +33,7 @@ async function login() {
             error.value = data.error
             return
         }
-
+        transitionName.value = 'fade-up'
         isLoggedIn.value = true
         currentUsername.value = data.username
         router.push("/")
