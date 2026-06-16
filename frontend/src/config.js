@@ -1,1 +1,1 @@
-export const API = "https://your-render-url.onrender.com"
+export const API = "https://habit-tracker-rebuild.onrender.com"
