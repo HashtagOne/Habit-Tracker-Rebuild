@@ -115,6 +115,12 @@ function handleConfirmCancel() {
 function selectCategory(category) {
     emit('select', category)
 }
+
+function onBeforeLeave(el) {
+    el.style.top = el.offsetTop + 'px'
+    el.style.left = el.offsetLeft + 'px'
+    el.style.width = el.offsetWidth + 'px'
+}
 </script>
 
 <template>
@@ -124,7 +130,12 @@ function selectCategory(category) {
         </div>
     
         <div class="categories-wrapper">
-            <TransitionGroup tag="div" name="category" class="categories-list">
+            <TransitionGroup 
+                tag="div" 
+                name="category" 
+                class="categories-list"
+                @before-leave="onBeforeLeave"
+            >
                 <div
                     v-for="category in categories"
                     :key="category.id"
